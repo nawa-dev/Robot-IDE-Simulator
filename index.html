@@ -8,8 +8,15 @@
 
     <script src="acorn.min.js"></script>
     <script src="https://neil.fraser.name/software/JS-Interpreter/acorn_interpreter.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+
+    <!-- Main modules (load in order) -->
+    <script src="physics.js" defer></script>
+    <script src="canvas.js" defer></script>
+    <script src="sensors.js" defer></script>
+    <script src="executor.js" defer></script>
+    <script src="storage.js" defer></script>
+    <script src="script.js" defer></script>
   </head>
   <body>
     <header class="toolbar">
@@ -219,7 +226,5 @@
       style="display: none"
       onchange="loadProject(this)"
     />
-
-    <script src="script.js" defer></script>
   </body>
 </html>
