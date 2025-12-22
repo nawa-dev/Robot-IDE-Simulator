@@ -562,3 +562,7 @@ button {
   font-weight: bold;
   font-size: 12px;
 }
+.robot-function {
+  color: #ffb81c !important;
+  font-weight: bold;
+}

@@ -11,6 +11,15 @@ require.config({
   },
 });
 require(["vs/editor/editor.main"], function () {
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    lib: ["es5"], // ✅ Array, Math, Object, String
+    allowNonTsExtensions: true,
+  });
+
+  //   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+  //     noSemanticValidation: true,
+  //     noSyntaxValidation: false,
+  //   });
   editor = monaco.editor.create(document.getElementById("monaco-container"), {
     value: [
       "for (var i = 0; i < 4; i++) {",
@@ -27,7 +36,108 @@ require(["vs/editor/editor.main"], function () {
     fontSize: 16,
     minimap: { enabled: false },
   });
+
+  // ✅ เรียกฟังก์ชันที่ถูกต้อง
+  setupRobotHighlighting(editor);
+  setupAutocomplete();
 });
+
+// --- Custom Highlighting for Robot API ---
+function setupRobotHighlighting(editor) {
+  const robotRegex = /\b(motor|delay|analogRead|getSensorCount|log)\b/g;
+  let decorationIds = [];
+
+  function updateDecorations() {
+    const model = editor.getModel();
+    if (!model) return;
+
+    const text = model.getValue();
+    const decorations = [];
+    let match;
+
+    while ((match = robotRegex.exec(text)) !== null) {
+      const start = model.getPositionAt(match.index);
+      const end = model.getPositionAt(match.index + match[0].length);
+
+      decorations.push({
+        range: new monaco.Range(
+          start.lineNumber,
+          start.column,
+          end.lineNumber,
+          end.column
+        ),
+        options: {
+          inlineClassName: "robot-function",
+        },
+      });
+    }
+
+    // ✅ ต้องเก็บ id เดิมไว้
+    decorationIds = editor.deltaDecorations(decorationIds, decorations);
+  }
+
+  updateDecorations();
+  editor.onDidChangeModelContent(updateDecorations);
+}
+
+// --- Autocomplete for Robot API ---
+function setupAutocomplete() {
+  const robotAPI = [
+    {
+      label: "motor",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "motor(${1:left}, ${2:right})",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      documentation:
+        "Control robot motors. motor(left, right) - left/right: 0-100",
+      detail: "motor(left: number, right: number) -> void",
+    },
+    {
+      label: "delay",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "delay(${1:milliseconds})",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      documentation: "Pause program for specified milliseconds",
+      detail: "delay(ms: number) -> Promise",
+    },
+    {
+      label: "analogRead",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "analogRead(${1:sensorIndex})",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      documentation:
+        "Read sensor brightness value (0-1024). 0=light, 1024=dark",
+      detail: "analogRead(index: number) -> number",
+    },
+    {
+      label: "getSensorCount",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "getSensorCount()",
+      documentation: "Get total number of sensors",
+      detail: "getSensorCount() -> number",
+    },
+    {
+      label: "log",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "log(${1:message})",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      documentation: "Print message to console",
+      detail: "log(message: string) -> void",
+    },
+  ];
+
+  monaco.languages.registerCompletionItemProvider("javascript", {
+    provideCompletionItems: (model, position) => {
+      return {
+        suggestions: robotAPI,
+      };
+    },
+  });
+}
 
 // --- 2. UI Resizers ---
 const resizerV = document.getElementById("drag-resizer");
@@ -86,7 +196,7 @@ let canvasPixelData = null;
 
 // --- 4. Robot Drag & Drop ---
 robot.addEventListener("mousedown", () => {
-  if (!isRunning) isDragging = true;
+  isDragging = true;
 });
 
 window.addEventListener("mouseup", () => (isDragging = false));
