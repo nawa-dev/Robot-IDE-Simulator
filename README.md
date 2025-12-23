@@ -1,4 +1,7 @@
+// ...existing code...
+
 # 🤖 Robot IDE Simulator
+
 <img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/39d0fe29-494f-4955-8ad0-733e7148c2eb" />
 
 A web-based integrated development environment (IDE) for programming robot simulations. Write JavaScript code to control a virtual robot with sensors, motors, and real-time visualization.
@@ -14,7 +17,7 @@ A web-based integrated development environment (IDE) for programming robot simul
 - **Sensor System** - Up to 25 light sensors with brightness detection
 - **Motor Control** - Left/right motor speed control (0-100)
 - **Canvas Design** - Customizable canvas size and background images
-- **Project Management** - Save/Load projects as JSON files
+- **Project Management** - Export / Import projects as JSON files (⬇️ Download / 📂 Open)
 - **Interactive Debugging** - Console output and real-time sensor visualization
 - **Drag & Drop** - Move robot on canvas while code is running
 
@@ -22,14 +25,13 @@ A web-based integrated development environment (IDE) for programming robot simul
 
 ### Online Demo
 
-Visit: `https://YOUR_USERNAME.github.io/robotSim/`
+Visit: `https://nawa-dev.github.io/Robot-IDE-Simulator/`
 
 ### Local Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/robotSim.git
-cd robotSim
+git clone https://github.com/nawa-dev/Robot-IDE-Simulator.git
 
 # Open in browser
 # Double-click index.html or use Live Server
@@ -44,7 +46,7 @@ cd robotSim
 
 1. Download `sampleProjectSetup.json` from this repository
 2. Open Robot IDE Simulator in your browser
-3. Click **📂 Open** button
+3. Click **📂 Open**
 4. Select `sampleProjectSetup.json`
 5. Watch the pre-configured project load with:
    - Sample code (Line Following algorithm)
@@ -100,11 +102,10 @@ while (1) {
 - **Drag robot** to reposition (even while running!)
 - Click **■ Stop** to halt execution
 
-### 5. Save Project
+### 5. Export / Import Project
 
-- Click **💾 Save** to save current project
-- Click **💾 Save As** to save with new name
-- Click **📂 Open** to load saved project
+- Click **⬇️ Download** to export the current project as a `.json` file
+- Click **📂 Open** to import a saved `.json` project
 
 ## 🎮 Robot API Reference
 
@@ -112,8 +113,8 @@ while (1) {
 
 ```javascript
 motor(left, right);
-// left: 0-100 (left motor speed)
-// right: 0-100 (right motor speed)
+// left: -100..100 (left motor speed)
+// right: -100..100 (right motor speed)
 // Example: motor(60, 40) - turn right
 ```
 
@@ -132,8 +133,7 @@ var value = analogRead(0);
 
 ```javascript
 delay(milliseconds);
-// Pause execution
-// Example: delay(1000) - wait 1 second
+// Pause execution (uses interpreter-friendly delay)
 
 getSensorCount();
 // Get total number of sensors
@@ -225,61 +225,19 @@ A complete beginner-friendly project with:
 
 ```
 robotSim/
-├── index.html                    # Main HTML file
-├── style.css                     # Stylesheet
-├── script.js                     # Core initialization
-├── physics.js                    # Physics & sensor system
-├── canvas.js                     # Canvas management
-├── sensors.js                    # Sensor UI management
-├── executor.js                   # Code execution
-├── storage.js                    # Save/Load functionality
-├── README.md                     # This file
-├── sampleProjectSetup.json       # Sample project file
-└── acorn_interpreter.js          # JavaScript interpreter
+├── 📂 src/
+│   ├── 📄 script.js            # Core initialization & UI handlers
+│   ├── 📄 physics.js           # Physics engine & sensor logic
+│   ├── 📄 canvas.js            # Canvas rendering management
+│   ├── 📄 sensors.js           # Sensor data UI management
+│   ├── 📄 executor.js          # Code execution engine
+│   ├── 📄 storage.js           # Import/Export functionality
+│   └── 📄 acorn_interpreter.js  # JavaScript interpreter engine
+├── 📄 index.html               # Entry point HTML
+├── 📄 style.css                # Global stylesheet
+├── 📄 README.md                # Project documentation
+└── 📄 sampleProjectSetup.json  # Sample configuration data
 ```
-
-## ⚙️ Customization
-
-### Change Robot Size
-
-Edit in `style.css`:
-
-```css
-#robot {
-  width: 50px;
-  height: 50px;
-  /* Adjust size as needed */
-}
-```
-
-### Adjust Physics Speed
-
-Edit in `executor.js`:
-
-```javascript
-for (let i = 0; i < 50; i++) {
-  // Increase = faster
-  if (!myInterpreter.step()) break;
-}
-```
-
-### Modify Sensor Detection Radius
-
-Edit in `physics.js`:
-
-```javascript
-function getPixelBrightness(x, y, radius = 3) {
-  // radius = 3 means 7x7 pixel detection area
-}
-```
-
-### Create Your Own Sample Projects
-
-1. Setup robot configuration in the IDE
-2. Write and test your code
-3. Click **💾 Save As**
-4. Name it `mySampleProject.json`
-5. Share with others or use as template
 
 ## 🐛 Troubleshooting
 
@@ -289,30 +247,6 @@ function getPixelBrightness(x, y, radius = 3) {
 - Make sure `delay()` is used for async operations
 - Verify sensor count with `getSensorCount()`
 
-**Q: Sensors not detecting properly**
-
-- Check sensor position (X, Y: 0-50)
-- Verify background image is loaded
-- Ensure brightness range is correct
-
-**Q: Robot moves too fast/slow**
-
-- Adjust motor speed (0-100)
-- Increase/decrease delay time
-- Edit step count in `executor.js`
-
-**Q: Can't save projects**
-
-- Use modern browser (Chrome, Firefox)
-- Check browser storage permissions
-- Try "Save As" instead
-
-**Q: Sample project won't load**
-
-- Make sure `sampleProjectSetup.json` is in the same folder as `index.html`
-- Check browser console for errors (F12)
-- Try downloading the file again
-
 ## 🔧 Technologies Used
 
 - **Monaco Editor** - Code editor with syntax highlighting
@@ -320,49 +254,6 @@ function getPixelBrightness(x, y, radius = 3) {
 - **JS-Interpreter** - Sandboxed JavaScript execution
 - **HTML5 Canvas** - Graphics and simulation
 - **Vanilla JavaScript** - No frameworks (lightweight)
-
-## 📝 License
-
-This project is open source and available under the MIT License.
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
-- Create and share sample projects
-
-## 📧 Contact & Support
-
-For questions or support:
-
-- Create an issue on GitHub
-- Check existing documentation
-- Review example programs
-- Load sample projects to learn
-
-## 🎓 Educational Use
-
-This simulator is perfect for:
-
-- Learning robotics programming
-- Understanding sensor input/output
-- Teaching control algorithms
-- Prototyping robot behavior
-- Classroom demonstrations
-
-## 📦 Project Info
-
-- **Version:** 1.0.0
-- **Last Updated:** December 2025
-- **Browser Support:** Chrome, Firefox, Safari, Edge
-- **File Size:** ~500KB (with CDN libraries)
-- **Sample Projects:** Included
-
----
 
 **Happy Coding! 🚀**
 
