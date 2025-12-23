@@ -44,7 +44,9 @@ require(["vs/editor/editor.main"], function () {
 });
 
 // --- Custom Highlighting for Robot API ---
+// --- Custom Highlighting for Robot API ---
 function setupRobotHighlighting(editor) {
+  // ✅ ใช้ regex เดิม
   const robotRegex = /\b(motor|delay|analogRead|getSensorCount|log)\b/g;
   let decorationIds = [];
 
@@ -57,8 +59,20 @@ function setupRobotHighlighting(editor) {
     let match;
 
     while ((match = robotRegex.exec(text)) !== null) {
-      const start = model.getPositionAt(match.index);
-      const end = model.getPositionAt(match.index + match[0].length);
+      const index = match.index;
+      const word = match[0];
+
+      const start = model.getPositionAt(index);
+      const end = model.getPositionAt(index + word.length);
+
+      // *** ⭐️ ส่วนที่เพิ่มเข้ามาเพื่อตรวจสอบ Comment (//) ***
+      const lineContent = model.getLineContent(start.lineNumber).trim();
+
+      // ถ้าบรรทัดเริ่มต้นด้วย // หรือบรรทัดว่าง/มีแต่ช่องว่าง ไม่ต้อง Highlight
+      if (lineContent.startsWith("//") || lineContent.length === 0) {
+        continue;
+      }
+      // ************************************************
 
       decorations.push({
         range: new monaco.Range(
@@ -73,7 +87,6 @@ function setupRobotHighlighting(editor) {
       });
     }
 
-    // ✅ ต้องเก็บ id เดิมไว้
     decorationIds = editor.deltaDecorations(decorationIds, decorations);
   }
 
@@ -291,7 +304,6 @@ setTimeout(() => {
   logToConsole("System initialized.", "info");
 }, 100);
 
-// --- 9. New Project ---
 // --- 9. New Project ---
 function newProject() {
   if (
