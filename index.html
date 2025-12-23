@@ -32,9 +32,10 @@
 
         <div class="separator"></div>
 
+        <button class="btn-tool" onclick="newProject()">📄 New</button>
         <button class="btn-tool" onclick="openProject()">📂 Open</button>
-        <button class="btn-tool" onclick="saveProject()">💾 Save</button>
-        <button class="btn-tool" onclick="saveProjectAs()">💾 Save As</button>
+        <button class="btn-tool" onclick="saveProjectAs()">💾 Save</button>
+        <!-- <button class="btn-tool" onclick="saveProjectAs()">💾 Save As</button> -->
 
         <div class="separator"></div>
 
@@ -129,7 +130,10 @@
 
       <section class="canvas-pane">
         <div id="canvas-area">
-          <div id="robot">
+          <div
+            id="robot"
+            style="left: 100px; top: 100px; transform: rotate(0deg)"
+          >
             <div class="wheel w-l"></div>
             ROBOT
             <div class="wheel w-r"></div>
@@ -232,5 +236,12 @@
       style="display: none"
       onchange="loadProject(this)"
     />
+    <script>
+      // เมื่อโหลดหน้าเว็บเสร็จ ให้ดึงข้อมูลจาก Storage มาใช้ทันที
+      window.addEventListener("DOMContentLoaded", () => {
+        // รอสักครู่เพื่อให้ Editor โหลดเสร็จ (ถ้ามี Delay)
+        setTimeout(loadFromWebStorage, 100);
+      });
+    </script>
   </body>
 </html>

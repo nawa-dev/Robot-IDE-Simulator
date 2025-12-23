@@ -8,6 +8,7 @@ function runCode() {
     logToConsole("Error: Acorn library is not loaded yet.", "error");
     return;
   }
+  autoSaveToWebStorage();
   stopProgram();
   clearConsole();
 
