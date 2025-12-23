@@ -66,26 +66,102 @@ function updateCanvasSize() {
 }
 
 // --- Handle map change ---
+// ensure file input is reset and clicked even if a custom map is already set
 function handleMapChange(select) {
   if (select.value === "upload") {
-    document.getElementById("map-upload").click();
+    const fileInput = document.getElementById("map-upload");
+    if (fileInput) {
+      // clear previous value so same-file uploads trigger onchange
+      fileInput.value = "";
+      fileInput.click();
+    } else {
+      console.warn("map-upload input not found.");
+    }
   } else {
+    // switch to default map
     canvasArea.style.backgroundImage = "none";
     canvasArea.style.backgroundColor = "#f0f0f0";
+
+    // ensure canvas image data is refreshed
     updateCanvasImageData();
+
+    // also reset the file input so future uploads (even same file) will fire
+    const fileInput = document.getElementById("map-upload");
+    if (fileInput) fileInput.value = "";
   }
 }
 
-// --- Load map file ---
+// Handle selection in map dropdown: separate "current" (display) and "upload" (action)
+function handleMapSelectChange(select) {
+  const val = (select && select.value) || "";
+  const currentOpt = document.getElementById("current-map-option");
+  const fileInput = document.getElementById("map-upload");
+
+  if (val === "upload") {
+    if (fileInput) {
+      try {
+        fileInput.value = "";
+      } catch (e) {}
+      fileInput.click();
+    }
+    // keep UI showing current map (don't stay on "upload")
+    if (currentOpt) select.value = "current";
+    return;
+  }
+
+  // user chose default map
+  if (val === "default") {
+    canvasArea.style.backgroundImage = "none";
+    canvasArea.style.backgroundColor = "#f0f0f0";
+    if (currentOpt) {
+      currentOpt.textContent = "No map loaded";
+      currentOpt.dataset.filename = "";
+    }
+    updateCanvasImageData();
+    if (fileInput) {
+      try {
+        fileInput.value = "";
+      } catch (e) {}
+    }
+    return;
+  }
+
+  // val === "current" -> do nothing (display only)
+}
+
+// Load map file and update "current" display option
 function loadMapFile(input) {
-  if (input.files && input.files[0]) {
+  if (input && input.files && input.files[0]) {
+    const file = input.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
       canvasArea.style.backgroundImage = `url('${e.target.result}')`;
       canvasArea.style.backgroundColor = "transparent";
       logToConsole("New map loaded successfully.");
+
+      // update current map option to show filename
+      const currentOpt = document.getElementById("current-map-option");
+      if (currentOpt) {
+        currentOpt.textContent = `Current: ${file.name}`;
+        currentOpt.dataset.filename = file.name;
+      }
+
+      // ensure canvas image data refreshed
       setTimeout(updateCanvasImageData, 100);
+
+      // clear input so same-file re-upload will trigger onchange later
+      try {
+        input.value = "";
+      } catch (err) {}
+
+      // set select back to current for clarity
+      const sel = document.getElementById("map-select");
+      if (sel) sel.value = "current";
     };
-    reader.readAsDataURL(input.files[0]);
+    reader.readAsDataURL(file);
+  } else {
+    try {
+      if (input) input.value = "";
+    } catch (err) {}
   }
 }
