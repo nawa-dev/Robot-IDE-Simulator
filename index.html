@@ -25,6 +25,25 @@
     <header class="toolbar">
       <div class="logo">ROBOT IDE</div>
       <div class="actions">
+        <div class="dropdown">
+          <button class="btn-tool dropbtn">
+            <i class="fas fa-file-alt"></i> File
+            <i class="fas fa-caret-down"></i>
+          </button>
+
+          <div class="dropdown-content">
+            <a href="javascript:void(0)" onclick="newProject()">
+              <i class="fas fa-file"></i> New
+            </a>
+            <a href="javascript:void(0)" onclick="openProject()">
+              <i class="fas fa-folder-open"></i> Open
+            </a>
+            <a href="javascript:void(0)" onclick="saveProjectAs()">
+              <i class="fas fa-download"></i> Export
+            </a>
+          </div>
+        </div>
+        <div class="separator"></div>
         <button id="run-btn" class="btn-run" onclick="runCode()">
           <i class="fas fa-play"></i> Run
         </button>
@@ -35,16 +54,6 @@
           <i class="fas fa-undo"></i> Reset
         </button>
 
-        <div class="separator"></div>
-        <button class="btn-tool" onclick="newProject()">
-          <i class="fas fa-file"></i> New
-        </button>
-        <button class="btn-tool" onclick="openProject()">
-          <i class="fas fa-folder-open"></i> Open
-        </button>
-        <button class="btn-tool" onclick="saveProjectAs()">
-          <i class="fas fa-download"></i> Export
-        </button>
         <!-- <button class="btn-tool" onclick="saveProjectAs()">💾 Save As</button> -->
 
         <div class="separator"></div>
@@ -54,7 +63,7 @@
           class="btn-tool"
           onclick="openRobotSettings()"
         >
-          <i class="fa-solid fa-gear"></i> Robot Settings
+          <i class="fa-solid fa-gear"></i> Sensor
         </button>
 
         <div class="separator"></div>
@@ -84,12 +93,22 @@
 
         <div class="canvas-settings">
           <span>Canvas: </span>
-          <input type="number" id="canvas-w" value="800" />
+          <input
+            type="number"
+            id="canvas-w"
+            value="800"
+            onchange="updateCanvasSize()"
+          />
           <span>x</span>
-          <input type="number" id="canvas-h" value="600" />
-          <button class="btn-tool" onclick="updateCanvasSize()">
+          <input
+            type="number"
+            id="canvas-h"
+            value="600"
+            onchange="updateCanvasSize()"
+          />
+          <!-- <button class="btn-tool" onclick="updateCanvasSize()">
             Set Size
-          </button>
+          </button> -->
 
           <div class="separator"></div>
 
@@ -113,7 +132,17 @@
           />
         </div>
       </div>
-      <div id="status">Ready</div>
+
+      <div class="github-container">
+        <a
+          href="https://github.com/nawa-dev/Robot-IDE-Simulator"
+          class="github-button"
+          target="_blank"
+        >
+          <i class="fa-brands fa-github"></i>
+          <span>GITHUB</span>
+        </a>
+      </div>
     </header>
 
     <main class="container">
@@ -125,6 +154,7 @@
         <div class="console-pane">
           <div class="console-header">
             <span>Console</span>
+
             <button
               onclick="clearConsole()"
               style="padding: 2px 8px; font-size: 10px"
@@ -139,6 +169,29 @@
       <div class="resizer" id="drag-resizer"></div>
 
       <section class="canvas-pane">
+        <div class="button-sensor-container">
+          <span class="sensor-label">Input Buttons:</span>
+          <div class="button-sensor-group">
+            <div class="button-div">
+              <label for="" style="margin: 0px">SW1</label>
+              <button id="button1" class="sensor-btn" title="Button 2">
+                <img src="/src/img/button.png" alt="btn2" />
+              </button>
+            </div>
+            <div class="button-div">
+              <label for="" style="margin: 0px">SW2</label>
+              <button id="button2" class="sensor-btn" title="Button 2">
+                <img src="/src/img/button.png" alt="btn2" />
+              </button>
+            </div>
+            <div class="button-div">
+              <label for="" style="margin: 0px">SW3</label>
+              <button id="button3" class="sensor-btn" title="Button 2">
+                <img src="/src/img/button.png" alt="btn2" />
+              </button>
+            </div>
+          </div>
+        </div>
         <div id="canvas-area">
           <div
             id="robot"
@@ -156,7 +209,7 @@
     <div id="robot-settings-modal" class="modal" style="display: none">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Robot Settings</h2>
+          <h2>Sensor</h2>
           <button class="modal-close" onclick="closeRobotSettings()">✕</button>
         </div>
 

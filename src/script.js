@@ -47,7 +47,8 @@ require(["vs/editor/editor.main"], function () {
 // --- Custom Highlighting for Robot API ---
 function setupRobotHighlighting(editor) {
   // ✅ ใช้ regex เดิม
-  const robotRegex = /\b(motor|delay|analogRead|getSensorCount|log)\b/g;
+  const robotRegex =
+    /\b(motor|delay|analogRead|getSensorCount|log)|SW|waitSW\b/g;
   let decorationIds = [];
 
   function updateDecorations() {
@@ -141,6 +142,25 @@ function setupAutocomplete() {
         monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
       documentation: "Print message to console",
       detail: "log(message: string) -> void",
+    },
+    {
+      label: "SW",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "SW(${1:n})",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      detail: "(n) -> boolean",
+      documentation:
+        "คืนค่า true หากปุ่มที่ระบุถูกกด และ false หากไม่ได้กด (1=SW1, 2=SW2, 3=SW3)",
+    },
+    {
+      label: "waitSW",
+      kind: monaco.languages.CompletionItemKind.Function,
+      insertText: "waitSW(${1:n});",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      detail: "(n) -> void",
+      documentation: "หยุดรอการทำงานของโปรแกรมจนกว่าปุ่มที่ระบุจะถูกกด",
     },
   ];
 

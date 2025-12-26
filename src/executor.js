@@ -20,14 +20,14 @@ function runCode() {
   } catch (e) {
     const line = e.loc ? ` (Line ${e.loc.line})` : "";
     logToConsole(`Syntax Error${line}: ${e.message}`, "error");
-    statusDiv.innerText = "Status: Code Error";
+    // statusDiv.innerText = "Status: Code Error";
     return;
   }
 
   try {
     myInterpreter = new Interpreter(code, initApi);
     isRunning = true;
-    statusDiv.innerText = "Status: Running...";
+    // statusDiv.innerText = "Status: Running...";
 
     function step() {
       if (isRunning && myInterpreter) {
@@ -63,7 +63,7 @@ function stopProgram() {
   motorL = 0;
   motorR = 0;
   myInterpreter = null;
-  statusDiv.innerText = "Status: Stopped";
+  // statusDiv.innerText = "Status: Stopped";
 }
 
 // --- Reset position ---
@@ -75,6 +75,29 @@ function resetPosition() {
   updateRobotDOM();
   logToConsole("Robot position reset.", "info");
 }
+
+// --- 1. ตัวแปรเก็บสถานะปุ่มทั้ง 3 (Index 0=SW1, 1=SW2, 2=SW3) ---
+let swStates = [false, false, false];
+
+// รายชื่อ ID ของปุ่มใน HTML (ตรวจสอบให้ตรงกับที่คุณตั้งไว้นะครับ)
+const swIds = ["button1", "button2", "button3"];
+
+swIds.forEach((id, index) => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener("mousedown", () => {
+      swStates[index] = true;
+      logToConsole(`SW${index + 1} Pressed`); //
+    });
+
+    btn.addEventListener("mouseup", () => {
+      swStates[index] = false;
+    });
+    btn.addEventListener("mouseleave", () => {
+      swStates[index] = false;
+    });
+  }
+});
 
 // --- Initialize API functions ---
 function initApi(interpreter, globalObject) {
@@ -148,5 +171,46 @@ function initApi(interpreter, globalObject) {
     globalObject,
     "delay",
     interpreter.createAsyncFunction(wrapperDelay)
+  );
+  const wrapperSW = function (n) {
+    const index = n - 1; // แปลงจาก 1-based เป็น 0-based array
+    if (index >= 0 && index < swStates.length) {
+      return swStates[index]; // คืนค่า true/false ทันที
+    }
+    return false;
+  };
+  interpreter.setProperty(
+    globalObject,
+    "SW",
+    interpreter.createNativeFunction(wrapperSW)
+  );
+  // ฟังก์ชัน waitSW(n) - รอจนกว่าปุ่ม n จะถูกกด
+  const wrapperWaitSW = function (n, callback) {
+    const index = n - 1; // แปลง 1-based เป็น 0-based
+
+    // ฟังก์ชันตรวจสอบสถานะปุ่มภายใน
+    function checkButton() {
+      if (index >= 0 && index < swStates.length) {
+        if (swStates[index]) {
+          // ถ้าปุ่มถูกกด (true) ให้เรียก callback เพื่อรันบรรทัดถัดไป
+          callback();
+        } else {
+          // ถ้ายังไม่กด ให้รอ 20ms แล้วกลับมาเช็คใหม่ (Polling)
+          setTimeout(checkButton, 20);
+        }
+      } else {
+        // หากระบุ index ผิด ให้รันต่อทันทีเพื่อป้องกันโปรแกรมค้าง
+        callback();
+      }
+    }
+
+    checkButton(); // เริ่มต้นการตรวจสอบรอบแรก
+  };
+
+  // ลงทะเบียนเป็น AsyncFunction เพื่อให้ Interpreter หยุดรอได้
+  interpreter.setProperty(
+    globalObject,
+    "waitSW",
+    interpreter.createAsyncFunction(wrapperWaitSW)
   );
 }
