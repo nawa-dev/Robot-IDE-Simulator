@@ -101,3 +101,72 @@ function getPixelBrightness(x, y) {
 
   return Math.round((255 - brightness) * 4);
 }
+
+/**
+ * DifferentialDrive
+ * - wheelBase: distance between wheels (px)
+ * - maxAccel: max acceleration (px/s^2)
+ * - maxSpeed: max wheel speed (px/s)
+ *
+ * state:
+ *  left.current/right.current : current wheel speeds (px/s)
+ *  left.target/right.target : commanded wheel speeds (px/s)
+ */
+function DifferentialDrive(opts) {
+  opts = opts || {};
+  this.wheelBase = opts.wheelBase || 40;
+  this.maxAccel = opts.maxAccel || 200;
+  this.maxSpeed = opts.maxSpeed || 220;
+
+  this.left = { target: 0, current: 0 };
+  this.right = { target: 0, current: 0 };
+}
+
+DifferentialDrive.prototype.setTargets = function (vL, vR) {
+  // clamp to maxSpeed
+  this.left.target = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, vL));
+  this.right.target = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, vR));
+};
+
+/**
+ * step(pose, dt)
+ * - pose: { x, y, theta } ; theta in radians
+ * - dt: seconds (from requestAnimationFrame)
+ *
+ * Applies acceleration limits to wheel speeds (motor inertia),
+ * then integrates differential-drive kinematics using dt.
+ */
+DifferentialDrive.prototype.step = function (pose, dt) {
+  if (!dt || dt <= 0) {
+    return { vL: this.left.current, vR: this.right.current, v: 0, omega: 0 };
+  }
+
+  // limit wheel speed change by maxAccel * dt
+  var limit = this.maxAccel * dt;
+  var updateWheel = function (m) {
+    var diff = m.target - m.current;
+    if (Math.abs(diff) <= limit) {
+      m.current = m.target;
+    } else {
+      m.current += Math.sign(diff) * limit;
+    }
+    return m.current;
+  };
+
+  var vL = updateWheel(this.left);
+  var vR = updateWheel(this.right);
+
+  // differential-drive kinematics
+  var v = 0.5 * (vR + vL); // linear velocity (px/s)
+  var omega = (vR - vL) / this.wheelBase; // angular velocity (rad/s)
+
+  // integrate
+  pose.x += v * Math.cos(pose.theta) * dt;
+  pose.y += v * Math.sin(pose.theta) * dt;
+  pose.theta += omega * dt;
+
+  // normalize theta to [0, 2pi)
+  pose.theta = ((pose.theta % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+
+  return { vL: vL, vR: vR, v: v, omega: omega };
+};

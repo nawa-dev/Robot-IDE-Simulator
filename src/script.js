@@ -323,3 +323,167 @@ setTimeout(() => {
   updateCanvasImageData();
   logToConsole("System initialized.", "info");
 }, 100);
+
+/**
+ * ============ CANVAS 2D RENDERER + TRACK BUFFER ============
+ * Parallel rendering system: keeps DOM intact but adds Canvas 2D for better fidelity
+ */
+
+let canvasRenderer = null;
+let trackBufferCanvas = null;
+let trackBufferCtx = null;
+
+function initCanvasRenderer() {
+  const canvasArea = document.getElementById("canvas-area");
+  if (!canvasArea) return;
+
+  // Create main onscreen canvas
+  canvasRenderer = document.createElement("canvas");
+  canvasRenderer.id = "main-render-canvas";
+  canvasRenderer.width = canvasArea.offsetWidth;
+  canvasRenderer.height = canvasArea.offsetHeight;
+  canvasRenderer.style.position = "absolute";
+  canvasRenderer.style.top = "0";
+  canvasRenderer.style.left = "0";
+  canvasRenderer.style.zIndex = "5";
+  canvasRenderer.style.cursor = "crosshair";
+
+  // Create hidden track buffer canvas
+  trackBufferCanvas = document.createElement("canvas");
+  trackBufferCanvas.width = canvasRenderer.width;
+  trackBufferCanvas.height = canvasRenderer.height;
+  trackBufferCtx = trackBufferCanvas.getContext("2d");
+
+  canvasArea.style.position = "relative";
+  canvasArea.insertBefore(canvasRenderer, canvasArea.firstChild);
+
+  logToConsole("Canvas 2D renderer initialized.", "info");
+}
+
+function renderCanvasFrame() {
+  if (!canvasRenderer) return;
+
+  const ctx = canvasRenderer.getContext("2d");
+  const w = canvasRenderer.width;
+  const h = canvasRenderer.height;
+
+  // Clear and draw background
+  ctx.fillStyle = "#f0f0f0";
+  ctx.fillRect(0, 0, w, h);
+
+  // Draw map if loaded
+  if (currentMapImage) {
+    ctx.drawImage(currentMapImage, 0, 0, w, h);
+  }
+
+  // Draw robot as circle + heading indicator
+  const robotSize = 25;
+  ctx.fillStyle = "#2d3436";
+  ctx.beginPath();
+  ctx.arc(robotX + 25, robotY + 25, robotSize, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw heading line
+  const rad = (angle * Math.PI) / 180;
+  ctx.strokeStyle = "rgba(255,255,255,0.8)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(robotX + 25, robotY + 25);
+  ctx.lineTo(
+    robotX + 25 + Math.cos(rad) * robotSize,
+    robotY + 25 + Math.sin(rad) * robotSize
+  );
+  ctx.stroke();
+
+  // Draw sensor positions as small dots
+  ctx.fillStyle = "rgba(100,200,255,0.6)";
+  sensors.forEach((s) => {
+    const localX = s.x - 25;
+    const localY = s.y - 25;
+    const cos_a = Math.cos(rad);
+    const sin_a = Math.sin(rad);
+    const rotatedX = localX * cos_a - localY * sin_a;
+    const rotatedY = localX * sin_a + localY * cos_a;
+    const canvasX = robotX + 25 + rotatedX;
+    const canvasY = robotY + 25 + rotatedY;
+    ctx.beginPath();
+    ctx.arc(canvasX, canvasY, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+/**
+ * Update track buffer: copy pixel data from visible canvas for sensor sampling
+ * This avoids repeatedly reading from DOM/CSS backgrounds
+ */
+function updateTrackBuffer() {
+  if (!trackBufferCtx || !canvasRenderer) return;
+  const ctx = canvasRenderer.getContext("2d");
+  const imgData = ctx.getImageData(
+    0,
+    0,
+    trackBufferCanvas.width,
+    trackBufferCanvas.height
+  );
+  trackBufferCtx.putImageData(imgData, 0, 0);
+}
+
+/**
+ * Sample area around a point in track buffer (3x3 or 5x5)
+ * Returns normalized brightness 0..1
+ */
+function sampleSensorAreaInBuffer(worldX, worldY, sampleSize = 5) {
+  if (!trackBufferCtx) return 0;
+
+  const sx = Math.max(0, Math.floor(worldX - sampleSize / 2));
+  const sy = Math.max(0, Math.floor(worldY - sampleSize / 2));
+  const sw = Math.min(trackBufferCanvas.width - sx, sampleSize);
+  const sh = Math.min(trackBufferCanvas.height - sy, sampleSize);
+
+  if (sw <= 0 || sh <= 0) return 0;
+
+  try {
+    const imgData = trackBufferCtx.getImageData(sx, sy, sw, sh);
+    const data = imgData.data;
+    let totalBrightness = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      // Luminance approximation (ITU-R BT.709)
+      totalBrightness += 0.299 * r + 0.587 * g + 0.114 * b;
+    }
+
+    const avg = totalBrightness / (sw * sh);
+    return Math.max(0, Math.min(1, avg / 255)); // normalize to 0..1
+  } catch (e) {
+    return 0;
+  }
+}
+
+// Hook run/stop buttons to simulation loop
+const runBtn = document.getElementById("run-btn");
+const stopBtn = document.getElementById("stop-btn");
+
+const originalRunCode = window.runCode;
+window.runCode = function () {
+  if (typeof originalRunCode === "function") {
+    originalRunCode.call(this);
+  }
+  // Start RAF loop when user code starts
+  if (typeof startSimulationLoop === "function") {
+    startSimulationLoop();
+  }
+};
+
+const originalStopProgram = window.stopProgram;
+window.stopProgram = function () {
+  if (typeof originalStopProgram === "function") {
+    originalStopProgram.call(this);
+  }
+  // Stop RAF loop when user code stops
+  if (typeof stopSimulationLoop === "function") {
+    stopSimulationLoop();
+  }
+};
