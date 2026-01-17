@@ -72,9 +72,9 @@ function updateSensorValue(id, axis, value) {
   updateSensorDots();
   logToConsole(
     `Sensor ${sensor.name} updated to (${sensor.x.toFixed(
-      1
+      1,
     )}, ${sensor.y.toFixed(1)})`,
-    "info"
+    "info",
   );
 }
 
@@ -87,7 +87,7 @@ function updateSensorPreview() {
   sensors.forEach((sensor) => {
     const circle = document.createElementNS(
       "http://www.w3.org/2000/svg",
-      "circle"
+      "circle",
     );
 
     circle.setAttribute("class", "sensor-circle");
@@ -101,9 +101,6 @@ function updateSensorPreview() {
 // --- Render sensors list ---
 function renderSensorsList() {
   const container = document.getElementById("sensors-container");
-  // const count = document.getElementById("sensor-count");
-
-  // count.innerText = sensors.length;
 
   if (sensors.length === 0) {
     container.innerHTML =
@@ -152,7 +149,7 @@ function renderSensorsList() {
         })">Delete</button>
       </div>
     </div>
-  `
+  `,
     )
     .join("");
 

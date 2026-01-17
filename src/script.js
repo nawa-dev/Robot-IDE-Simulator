@@ -12,14 +12,9 @@ require.config({
 });
 require(["vs/editor/editor.main"], function () {
   monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-    lib: ["es5"], // ✅ Array, Math, Object, String
+    lib: ["es5"], // Array, Math, Object, String
     allowNonTsExtensions: true,
   });
-
-  //   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-  //     noSemanticValidation: true,
-  //     noSyntaxValidation: false,
-  //   });
   editor = monaco.editor.create(document.getElementById("monaco-container"), {
     value: [
       "log('Robot Start')",
@@ -38,7 +33,6 @@ require(["vs/editor/editor.main"], function () {
     minimap: { enabled: false },
   });
 
-  // ✅ เรียกฟังก์ชันที่ถูกต้อง
   setupRobotHighlighting(editor);
   setupAutocomplete();
 });
@@ -46,7 +40,6 @@ require(["vs/editor/editor.main"], function () {
 // --- Custom Highlighting for Robot API ---
 // --- Custom Highlighting for Robot API ---
 function setupRobotHighlighting(editor) {
-  // ✅ ใช้ regex เดิม
   const robotRegex =
     /\b(motor|delay|analogRead|getSensorCount|log)|SW|waitSW\b/g;
   let decorationIds = [];
@@ -66,7 +59,7 @@ function setupRobotHighlighting(editor) {
       const start = model.getPositionAt(index);
       const end = model.getPositionAt(index + word.length);
 
-      // *** ⭐️ ส่วนที่เพิ่มเข้ามาเพื่อตรวจสอบ Comment (//) ***
+      // ส่วนที่เพิ่มเข้ามาเพื่อตรวจสอบ Comment (//) ***
       const lineContent = model.getLineContent(start.lineNumber).trim();
 
       // ถ้าบรรทัดเริ่มต้นด้วย // หรือบรรทัดว่าง/มีแต่ช่องว่าง ไม่ต้อง Highlight
@@ -207,27 +200,6 @@ function resizeHorizontal(e) {
     consolePane.style.height = newHeight + "px";
   }
 }
-
-// --- 3. Global State Variables ---
-const robot = document.getElementById("robot");
-const canvasArea = document.getElementById("canvas-area");
-const statusDiv = document.getElementById("status");
-
-let robotX = 100,
-  robotY = 100,
-  angle = 0;
-
-((motorL = 0), (motorR = 0));
-
-let isRunning = false,
-  isDragging = false,
-  myInterpreter = null;
-
-let sensors = [];
-const MAX_SENSORS = 25;
-
-let canvasImageData = null;
-let canvasPixelData = null;
 
 // --- 4. Robot Drag & Drop ---
 robot.addEventListener("mousedown", () => {

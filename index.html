@@ -4,7 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ROBO-JS</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style/base.css" />
+    <link rel="stylesheet" href="style/toolbar.css" />
+    <link rel="stylesheet" href="style/buttons.css" />
+    <link rel="stylesheet" href="style/dropdown.css" />
+    <link rel="stylesheet" href="style/editor.css" />
+    <link rel="stylesheet" href="style/resizer.css" />
+    <link rel="stylesheet" href="style/canvas.css" />
+    <link rel="stylesheet" href="style/controls.css" />
+    <link rel="stylesheet" href="style/modal.css" />
+    <link rel="stylesheet" href="style/sensors.css" />
+    <link rel="stylesheet" href="style/input-buttons.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -14,6 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
 
     <!-- Main modules (load in order) -->
+    <script src="src/variableGlobal.js" defer></script>
     <script src="src/physics.js" defer></script>
     <script src="src/canvas.js" defer></script>
     <script src="src/sensors.js" defer></script>
@@ -53,9 +64,6 @@
         <button id="reset-btn" class="btn-reset" onclick="resetPosition()">
           <i class="fas fa-undo"></i> Reset
         </button>
-
-        <!-- <button class="btn-tool" onclick="saveProjectAs()">💾 Save As</button> -->
-
         <div class="separator"></div>
 
         <button

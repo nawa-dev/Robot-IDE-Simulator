@@ -32,6 +32,7 @@ function createProjectData() {
       x: robotX,
       y: robotY,
       angle: angle,
+      motorPos: motorPos,
     },
   };
 }
@@ -151,12 +152,23 @@ function applyProjectData(projectData) {
   robotX = projectData.robotState.x || 100;
   robotY = projectData.robotState.y || 100;
   angle = projectData.robotState.angle || 0;
+  motorPos = projectData.robotState.motorPos || 0;
   updateRobotDOM();
-
+  updateMotorPostion();
   currentProjectName = projectData.projectName || "Untitled Project";
   updateStatusBar();
 }
 const STORAGE_KEY = "robot_sim_autosave";
+
+function updateMotorPostion() {
+  document.getElementById("motorPos-input").value = Math.round(motorPos);
+  document.getElementById("motor-left").setAttribute("x", motorPos + 20);
+  document.getElementById("motor-right").setAttribute("x", motorPos + 20);
+  document.documentElement.style.setProperty(
+    "--motorPos",
+    motorPos + 20 + "px",
+  );
+}
 
 function createProjectData() {
   const currentOpt = document.getElementById("current-map-option");
@@ -176,7 +188,7 @@ function createProjectData() {
     },
     sensors: sensors.map((s) => ({ id: s.id, x: s.x, y: s.y, name: s.name })),
     sourceCode: editor.getValue(),
-    robotState: { x: robotX, y: robotY, angle: angle },
+    robotState: { x: robotX, y: robotY, angle: angle, motorPos: motorPos },
   };
 }
 
@@ -239,6 +251,7 @@ function newProject() {
     robotX = 100;
     robotY = 100;
     angle = 0;
+    motorPos = 0;
     updateRobotDOM();
 
     // 6. รีเซ็ตแผนที่ (กลับไปเป็น Default)

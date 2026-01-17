@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "projectName": "testFullFunction",
+  "projectName": "sampleSetup",
   "canvas": {
     "width": "800",
     "height": "600"
@@ -22,12 +22,19 @@
       "x": 45,
       "y": 35,
       "name": "Light Sensor 2"
+    },
+    {
+      "id": 1767546923902,
+      "x": 45,
+      "y": 25,
+      "name": "Light Sensor 3"
     }
   ],
-  "sourceCode": "\n\nlog(\"System Ready.\");\n\n// 1. รอจนกว่าจะกดปุ่ม SW1 ถึงจะเริ่มทำงาน\nwaitSW(1); \nlog(\"Robot Starting...\");\n\nwhile(true) {\n    var lineL = analogRead(0); // เซนเซอร์ซ้าย\n    var lineR = analogRead(1); // เซนเซอร์ขวา\n\n    if (lineL > 500) {\n        motor(20, 60); // เลี้ยวซ้ายเข้าหาเส้น\n    } else if (lineR > 500) {\n        motor(60, 20); // เลี้ยวขวาเข้าหาเส้น\n    } else {\n        motor(50, 50); // เดินหน้าปกติ\n    }\n    \n    // หยุดการทำงานเมื่อกด SW3\n    if (SW(3)) {\n        motor(0, 0);\n        log(\"Emergency Stop!\");\n        break;\n    }\n    \n    delay(1); // ปรับจังหวะการทำงานให้สมูท\n}",
+  "sourceCode": "log(\"System Ready.\");\n\n// รอเริ่ม\nwaitSW(1);\nlog(\"Robot Starting...\");\n\n// ================= PID PARAM =================\nvar Kp = 0.6;     // ปรับแรงเลี้ยว\nvar Ki = 0.0;     // เริ่มจาก 0 ก่อน\nvar Kd = 0.3;     // ลดการสั่น\n\nvar baseSpeed = 50;\n\nvar error = 0;\nvar lastError = 0;\nvar integral = 0;\n// =============================================\n\nwhile (true) {\n\n    // อ่านค่าเซนเซอร์\n    var lineL = analogRead(0); // ซ้าย\n    var lineC = analogRead(2); // กลาง\n    var lineR = analogRead(1); // ขวา\n\n    // คำนวณ error\n    // ถ้าซ้ายเจอเส้นมาก → error ติดลบ → เลี้ยวซ้าย\n    // ถ้าขวาเจอเส้นมาก → error เป็นบวก → เลี้ยวขวา\n    error = lineR - lineL;\n\n    // PID\n    integral += error;\n    var derivative = error - lastError;\n    var correction = (Kp * error) + (Ki * integral) + (Kd * derivative);\n    lastError = error;\n\n    // คำนวณความเร็วล้อ\n    var leftSpeed  = baseSpeed - correction;\n    var rightSpeed = baseSpeed + correction;\n\n    // จำกัดความเร็ว\n    leftSpeed  = Math.max(0, Math.min(100, leftSpeed));\n    rightSpeed = Math.max(0, Math.min(100, rightSpeed));\n\n    motor(leftSpeed, rightSpeed);\n\n    // Emergency Stop\n    if (SW(3)) {\n        motor(0, 0);\n        log(\"Emergency Stop!\");\n        break;\n    }\n\n    delay(1);\n}",
   "robotState": {
-    "x": 465.99348136587906,
-    "y": 42.8504542920795,
-    "angle": -5052
+    "x": 41.068455269578266,
+    "y": 171.6622770565233,
+    "angle": 271.04828602812006,
+    "motorPos": -12
   }
 }

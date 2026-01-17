@@ -1,0 +1,23 @@
+/* Resizer controls */
+.resizer {
+  width: 6px;
+  cursor: col-resize;
+  background: #3e3e3e;
+  transition: background 0.2s;
+  z-index: 100;
+}
+
+.resizer:hover {
+  background: #ff4757;
+}
+
+.h-resizer {
+  height: 6px;
+  cursor: row-resize;
+  background: #3e3e3e;
+  transition: background 0.2s;
+}
+
+.h-resizer:hover {
+  background: #ff4757;
+}

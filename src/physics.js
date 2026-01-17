@@ -4,7 +4,7 @@
 
 // --- 1. DifferentialDrive Engine ---
 // ทำหน้าที่คำนวณจลนศาสตร์และความเร่งของมอเตอร์
-let motorPos = 0;
+
 function DifferentialDrive(opts) {
   opts = opts || {};
   this.wheelBase = opts.wheelBase || 40; // ระยะห่างระหว่างล้อ (px)
@@ -69,7 +69,6 @@ function updatePhysics(timestamp) {
     robotDrive.setTargets(motorL * 2.5, motorR * 2.5);
 
     // เตรียมสถานะปัจจุบัน (แปลงจาก Global Variables)
-    logToConsole(`Robot angle set to ${motorPos}`, "info");
     let pose = {
       x: robotX + 25 + motorPos * Math.cos((angle * Math.PI) / 180),
       y: robotY + 25 + motorPos * Math.sin((angle * Math.PI) / 180),

@@ -1,0 +1,32 @@
+/* Base styles and layout */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #1e1e1e;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  height: calc(100vh - 50px);
+  width: 100vw;
+}
+
+button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.separator {
+  width: 1px;
+  height: 20px;
+  background: #555;
+}

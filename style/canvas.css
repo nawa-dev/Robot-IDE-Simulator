@@ -1,0 +1,70 @@
+/* Canvas area and robot styles */
+.canvas-pane {
+  flex-grow: 1;
+  background: #252526;
+  overflow: auto;
+  padding: 0;
+}
+
+#canvas-area {
+  background: #f0f0f0;
+  position: relative;
+  margin: 20px auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition:
+    width 0.3s,
+    height 0.3s;
+}
+
+#robot {
+  width: 50px;
+  height: 50px;
+  background: #ff4757;
+  position: absolute;
+  border-radius: 4px;
+  border: 2px solid #333;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.wheel {
+  width: 8px;
+  height: 14px;
+  background: #000;
+  position: absolute;
+  border-radius: 2px;
+}
+
+.w-l {
+  top: -8px;
+  left: var(--motorPos);
+}
+
+.w-r {
+  bottom: -8px;
+  left: var(--motorPos);
+}
+
+.sensor-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #4caf50;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sensor-dot:hover {
+  background: #66bb6a;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.9);
+}
