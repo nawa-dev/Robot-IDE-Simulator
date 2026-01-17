@@ -127,7 +127,7 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "analogRead",
-    interpreter.createNativeFunction(wrapperAnalogRead)
+    interpreter.createNativeFunction(wrapperAnalogRead),
   );
 
   // 2. getSensorCount()
@@ -137,7 +137,7 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "getSensorCount",
-    interpreter.createNativeFunction(wrapperGetCount)
+    interpreter.createNativeFunction(wrapperGetCount),
   );
 
   // 3. motor(l, r) — mapped to differential-drive wheel speeds
@@ -164,13 +164,8 @@ function initApi(interpreter, globalObject) {
   };
   interpreter.setProperty(
     globalObject,
-    "setWheelSpeeds",
-    interpreter.createNativeFunction(wrapperSetWheelSpeeds)
-  );
-  interpreter.setProperty(
-    globalObject,
     "motor",
-    interpreter.createNativeFunction(wrapperSetWheelSpeeds)
+    interpreter.createNativeFunction(wrapperSetWheelSpeeds),
   );
   // 4. log(text)
   const wrapperLog = function (t) {
@@ -179,7 +174,7 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "log",
-    interpreter.createNativeFunction(wrapperLog)
+    interpreter.createNativeFunction(wrapperLog),
   );
 
   // 5. delay(ms)
@@ -189,7 +184,7 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "delay",
-    interpreter.createAsyncFunction(wrapperDelay)
+    interpreter.createAsyncFunction(wrapperDelay),
   );
 
   // 6. SW(n) — switch button read
@@ -203,7 +198,7 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "SW",
-    interpreter.createNativeFunction(wrapperSW)
+    interpreter.createNativeFunction(wrapperSW),
   );
 
   // 7. waitSW(n) — wait for button press
@@ -228,6 +223,6 @@ function initApi(interpreter, globalObject) {
   interpreter.setProperty(
     globalObject,
     "waitSW",
-    interpreter.createAsyncFunction(wrapperWaitSW)
+    interpreter.createAsyncFunction(wrapperWaitSW),
   );
 }

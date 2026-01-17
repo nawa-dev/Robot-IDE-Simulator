@@ -2,6 +2,12 @@
  * ROBOT IDE SIMULATOR - Core Script
  * Main initialization and UI event handlers
  */
+const drive = new DifferentialDrive({
+  wheelBase: 40,
+  maxAccel: 300,
+  maxSpeed: 200,
+});
+let lastTime = 0;
 
 // --- 1. Monaco Editor Setup ---
 let editor;
@@ -80,7 +86,7 @@ function setupRobotHighlighting(editor) {
           start.lineNumber,
           start.column,
           end.lineNumber,
-          end.column
+          end.column,
         ),
         options: {
           inlineClassName: "robot-function",
@@ -182,7 +188,7 @@ const consolePane = document.querySelector(".console-pane");
 resizerV.addEventListener("mousedown", () => {
   document.addEventListener("mousemove", resizeVertical);
   document.addEventListener("mouseup", () =>
-    document.removeEventListener("mousemove", resizeVertical)
+    document.removeEventListener("mousemove", resizeVertical),
   );
 });
 
@@ -196,7 +202,7 @@ function resizeVertical(e) {
 resizerH.addEventListener("mousedown", () => {
   document.addEventListener("mousemove", resizeHorizontal);
   document.addEventListener("mouseup", () =>
-    document.removeEventListener("mousemove", resizeHorizontal)
+    document.removeEventListener("mousemove", resizeHorizontal),
   );
 });
 
@@ -391,7 +397,7 @@ function renderCanvasFrame() {
   ctx.moveTo(robotX + 25, robotY + 25);
   ctx.lineTo(
     robotX + 25 + Math.cos(rad) * robotSize,
-    robotY + 25 + Math.sin(rad) * robotSize
+    robotY + 25 + Math.sin(rad) * robotSize,
   );
   ctx.stroke();
 
@@ -423,7 +429,7 @@ function updateTrackBuffer() {
     0,
     0,
     trackBufferCanvas.width,
-    trackBufferCanvas.height
+    trackBufferCanvas.height,
   );
   trackBufferCtx.putImageData(imgData, 0, 0);
 }
