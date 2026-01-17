@@ -33,24 +33,6 @@ var physics = new DifferentialDrive({
 var state = window.robotState || { pose: { x: 100, y: 100, theta: 0 } };
 window.robotState = state; // expose if other scripts reference it
 
-// hook for rendering function used in project (if canvas.js exposes one)
-var renderScene =
-  window.renderScene ||
-  function (pose) {
-    // fallback: if original code used DOM robot element, update it here (minimal)
-    var el = document.getElementById("robot");
-    if (el) {
-      el.style.left = (pose.x | 0) + "px";
-      el.style.top = (pose.y | 0) + "px";
-      el.style.transform = "rotate(" + pose.theta * (180 / Math.PI) + "deg)";
-    }
-  };
-
-/**
- * ============ ANIMATION LOOP WITH DELTA TIME ============
- * Uses requestAnimationFrame for consistent frame timing
- */
-
 let rafId = null;
 let lastTimestamp = null;
 let isSimulating = false;
@@ -105,13 +87,6 @@ function simulationStep(currentTimestamp) {
   if (isSimulating) {
     rafId = requestAnimationFrame(simulationStep);
   }
-}
-
-function startSimulationLoop() {
-  if (rafId) cancelAnimationFrame(rafId);
-  lastTimestamp = null;
-  isSimulating = true;
-  rafId = requestAnimationFrame(simulationStep);
 }
 
 function stopSimulationLoop() {
